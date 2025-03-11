@@ -3,6 +3,11 @@ package com.taskapp.logic;
 import com.taskapp.dataaccess.LogDataAccess;
 import com.taskapp.dataaccess.TaskDataAccess;
 import com.taskapp.dataaccess.UserDataAccess;
+import com.taskapp.model.User;
+import com.taskapp.model.Task;
+
+import java.util.List;
+
 
 public class TaskLogic {
     private final TaskDataAccess taskDataAccess;
@@ -30,12 +35,38 @@ public class TaskLogic {
 
     /**
      * 全てのタスクを表示します。
+     * 設問2
+     * TaskDataAccess.findAllでtasks.csvの一覧をTask型のListで取得する
+     * List1つずつに下記処理を行い、表示する
+     * UserDataAccess.findByCodeへTaskListより取得したrepUserを設定し、該当するユーザ名を取得する
+     * 自分以外→担当者名、自分→あなたが担当しています
+     * statusを0→未着手、1→着手中、2→完了へ読み替える
      *
      * @see com.taskapp.dataaccess.TaskDataAccess#findAll()
      * @param loginUser ログインユーザー
      */
-    // public void showAll(User loginUser) {
-    // }
+    public void showAll(User loginUser) {
+        List<Task> tasklist = taskDataAccess.findAll();
+        for (Task task : tasklist) {
+            int code = task.getRepUser().getCode();
+            User taskuser = userDataAccess.findByCode(code);
+            String taskusername = taskuser.getName(); // タスクごとのユーザ名
+
+            if (code == loginUser.getCode()) {
+                taskusername = "あなた";
+            }
+            String status;
+            if (task.getStatus() == 1) {
+                status = "着手中";
+            } else if (task.getStatus() == 2) {
+                status = "完了";
+            } else {
+                status = "未着手";
+            }
+            System.out.println("タスク名：" + task.getName() + ", " + "担当者名：" + taskusername + "が担当しています" +
+            ", ステータス：" + status);
+            }
+        }
 
     /**
      * 新しいタスクを保存します。
@@ -51,6 +82,7 @@ public class TaskLogic {
      */
     // public void save(int code, String name, int repUserCode,
     //                 User loginUser) throws AppException {
+        
     // }
 
     /**
